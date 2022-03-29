@@ -43,6 +43,7 @@ void AdjacencyMatrix::importInstance(std::string path) {
       }
       int weight = std::stoi(fileData.front());
       this->at(originNode, destinyNode) = weight;
+      this->at(destinyNode, originNode) = weight;
       fileData.pop();
       ++lineCount;
     }
@@ -81,6 +82,22 @@ int AdjacencyMatrix::at(std::string originNode, std::string destinyNode) const {
 
 int& AdjacencyMatrix::at(std::string originNode, std::string destinyNode) {
   return adjacencyMatrix_[nodesRelation_[originNode]][nodesRelation_[destinyNode]];
+}
+
+std::string AdjacencyMatrix::closerConexion(std::string originNode) {
+  int minConexion = -1;
+  for(unsigned i = 0; i < nodes_.size(); ++i) {
+    if(i != nodesRelation_[originNode]) {
+      if(minConexion < 0 || adjacencyMatrix_[nodesRelation_[originNode]][i] < adjacencyMatrix_[nodesRelation_[originNode]][minConexion]) {
+        minConexion = i;
+      }
+    }
+  }
+  return nodesRelation_[minConexion];
+}
+
+int AdjacencyMatrix::numberOfNodes() {
+  return nodes_.size();
 }
 
 }

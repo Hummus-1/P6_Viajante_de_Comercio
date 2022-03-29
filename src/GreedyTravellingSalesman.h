@@ -19,7 +19,7 @@ class TravellingSalesman {
     void Solve(std::string path, std::string originNode, std::string destinyNode);
     void Solve(AdjacencyMatrix adjacencyMatrix, std::string originNode, std::string destinyNode);
   protected:
-    virtual void solveProblem(AdjacencyMatrix adjacencyMatrix, std::string originNode, std::string destinyNode) = 0;
+    void solveProblem(AdjacencyMatrix adjacencyMatrix, std::string originNode, std::string destinyNode);
 };
 
 }

@@ -24,6 +24,8 @@ class AdjacencyMatrix {
     void addNode(std::string nodeName);
     void addConexion(std::string originNode, std::string destinyNode);
     int at(std::string originNode, std::string destinyNode) const;
+    std::string closerConexion(std::string originNode);
+    int numberOfNodes();
   private:
     int& at(std::string originNode, std::string destinyNode);
     void importInstance(std::string path);
