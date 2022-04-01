@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <utility>
+#include <algorithm>
 
 #include "AdjacencyMatrix.h"
 #include "TravellingSalesman.h"
@@ -12,12 +13,10 @@
 
 namespace TSP {
 
-class GTS : public TravellingSalesman {
-  public:
-    // GTS();
-    // ~GTS();
+class RTS : public TravellingSalesman {
   protected:
     std::vector<std::string> solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode, unsigned destinyNode);
+    std::vector<std::vector<unsigned> > allCombinations(AdjacencyMatrix& adjacencyMatrix, unsigned destinyNode, std::vector<unsigned> myPath);
 };
 
 }

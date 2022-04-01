@@ -13,13 +13,13 @@ namespace TSP {
 
 class TravellingSalesman {
   public:
-    TravellingSalesman();
-    ~TravellingSalesman();
-    void Solve(int numberOfNodes, std::string originNode, std::string destinyNode);
-    void Solve(std::string path, std::string originNode, std::string destinyNode);
-    void Solve(AdjacencyMatrix adjacencyMatrix, std::string originNode, std::string destinyNode);
+    TravellingSalesman() {}
+    ~TravellingSalesman() {}
+    std::vector<std::string> Solve(int numberOfNodes, std::string originNode, std::string destinyNode);
+    std::vector<std::string> Solve(std::string path, std::string originNode, std::string destinyNode);
+    std::vector<std::string> Solve(AdjacencyMatrix adjacencyMatrix, std::string originNode, std::string destinyNode);
   protected:
-    virtual void solveProblem(AdjacencyMatrix adjacencyMatrix, std::string originNode, std::string destinyNode) = 0;
+    virtual std::vector<std::string> solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode, unsigned destinyNode) = 0;
 };
 
 }

@@ -16,19 +16,25 @@ namespace TSP {
 
 class AdjacencyMatrix {
   public: 
-    AdjacencyMatrix(int numberOfNodes);
+    AdjacencyMatrix(unsigned numberOfNodes);
     AdjacencyMatrix(std::string path);
 
     void exportInstance(std::string path);
 
-    void addNode(std::string nodeName);
-    void addConexion(std::string originNode, std::string destinyNode);
+    unsigned convertNode(std::string nodeName) {return nodesRelation_[nodeName];}
+    std::string convertNode(unsigned nodeNumber) {return nodes_[nodeNumber];}
     int at(std::string originNode, std::string destinyNode) const;
-    std::string closerConexion(std::string originNode);
-    int numberOfNodes();
+    int at(unsigned originNode, unsigned destinyNode) const;
+    unsigned numberOfNodes();
+    int pathWeight(std::vector<std::string> path);
+    int pathWeight(std::vector<unsigned> path);
+
+    unsigned closerConnection(unsigned originNode, std::vector<bool> visitedNodes = *new std::vector<bool>(0));
   private:
     int& at(std::string originNode, std::string destinyNode);
     void importInstance(std::string path);
+
+
     Matrix adjacencyMatrix_;
     std::vector<std::string> nodes_;
     std::map<std::string, unsigned> nodesRelation_;

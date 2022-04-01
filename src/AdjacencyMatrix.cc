@@ -2,9 +2,9 @@
 
 namespace TSP {
 
-AdjacencyMatrix::AdjacencyMatrix(int numberOfNodes) : 
+AdjacencyMatrix::AdjacencyMatrix(unsigned numberOfNodes) : 
                  adjacencyMatrix_(*new Matrix(numberOfNodes, numberOfNodes)) {
-  int stringLength = 1 + numberOfNodes / 20;
+  unsigned stringLength = 1 + numberOfNodes / 20;
   for(unsigned i = 0; i < numberOfNodes; ++i) {
     std::string nodeName = generateRandomString(stringLength);
     if(nodesRelation_.find(nodeName) != nodesRelation_.end())
@@ -58,9 +58,8 @@ void AdjacencyMatrix::importInstance(std::string path) {
 
 void AdjacencyMatrix::exportInstance(std::string path) {
   std::fstream outputFile = OpenFile(path, 'w');
-  int numberOfNodes = nodes_.size();
+  unsigned numberOfNodes = nodes_.size();
   outputFile << numberOfNodes << '\n';
-  int numberOfLines = ((numberOfNodes * (numberOfNodes - 1)) / 2);
   for(unsigned i = 0; i < numberOfNodes; ++i) {
     for(unsigned j = i + 1; j < numberOfNodes; ++j) {
       outputFile << nodes_[i] << ' ' << nodes_[j] << ' ' << adjacencyMatrix_[i][j] << '\n';
@@ -68,35 +67,49 @@ void AdjacencyMatrix::exportInstance(std::string path) {
   }
 }
 
-void AdjacencyMatrix::addNode(std::string nodeName) {
-
-}
-
-void AdjacencyMatrix::addConexion(std::string originNode, std::string destinyNode) {
-
-}
-
 int AdjacencyMatrix::at(std::string originNode, std::string destinyNode) const {
-  adjacencyMatrix_[nodesRelation_.at(originNode)][nodesRelation_.at(destinyNode)];
+  return adjacencyMatrix_[nodesRelation_.at(originNode)][nodesRelation_.at(destinyNode)];
+}
+
+int AdjacencyMatrix::at(unsigned originNode, unsigned destinyNode) const {
+  return adjacencyMatrix_[originNode][destinyNode];
+}
+
+int AdjacencyMatrix::pathWeight(std::vector<std::string> path) {
+  int weight = 0;
+  for(unsigned i = 1; i < path.size(); ++i) {
+    weight += at(path[i - 1], path[i]);
+  }
+  return weight;
+}
+
+int AdjacencyMatrix::pathWeight(std::vector<unsigned> path) {
+  int weight = 0;
+  for(unsigned i = 1; i < path.size(); ++i) {
+    weight += at(path[i - 1], path[i]);
+  }
+  return weight;
 }
 
 int& AdjacencyMatrix::at(std::string originNode, std::string destinyNode) {
   return adjacencyMatrix_[nodesRelation_[originNode]][nodesRelation_[destinyNode]];
 }
 
-std::string AdjacencyMatrix::closerConexion(std::string originNode) {
-  int minConexion = -1;
+unsigned AdjacencyMatrix::closerConnection(unsigned originNode, std::vector<bool> visitedNodes) {
+  if(visitedNodes.size() == 0)
+    visitedNodes = *new std::vector<bool>(numberOfNodes(), false);
+  int minConnection = -1;
   for(unsigned i = 0; i < nodes_.size(); ++i) {
-    if(i != nodesRelation_[originNode]) {
-      if(minConexion < 0 || adjacencyMatrix_[nodesRelation_[originNode]][i] < adjacencyMatrix_[nodesRelation_[originNode]][minConexion]) {
-        minConexion = i;
+    if(i != originNode && !visitedNodes[i]) {
+      if(minConnection < 0 || adjacencyMatrix_[originNode][i] < adjacencyMatrix_[originNode][minConnection]) {
+        minConnection = i;
       }
     }
   }
-  return nodesRelation_[minConexion];
+  return minConnection;
 }
 
-int AdjacencyMatrix::numberOfNodes() {
+unsigned AdjacencyMatrix::numberOfNodes() {
   return nodes_.size();
 }
 
