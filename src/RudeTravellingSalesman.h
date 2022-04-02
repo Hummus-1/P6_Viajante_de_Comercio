@@ -15,8 +15,8 @@ namespace TSP {
 
 class RTS : public TravellingSalesman {
   protected:
-    std::vector<std::string> solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode, unsigned destinyNode);
-    std::vector<std::vector<unsigned> > allCombinations(AdjacencyMatrix& adjacencyMatrix, unsigned destinyNode, std::vector<unsigned> myPath);
+    std::vector<std::string> solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode);
+    std::vector<std::vector<unsigned> > allCombinations(AdjacencyMatrix& adjacencyMatrix, std::vector<unsigned> myPath);
 };
 
 }

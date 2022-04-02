@@ -1,9 +1,9 @@
 10
-f c 100
+f c 2
 f w 48
 f x 62
 f n 6
-f q 92
+f q 1
 f d 27
 f g 47
 f m 68
@@ -25,7 +25,7 @@ w m 6
 w p 67
 x n 23
 x q 75
-x d 97
+x d 1
 x g 49
 x m 22
 x p 17

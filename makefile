@@ -4,8 +4,8 @@
 
 # Compiler settings - Can be customized.
 CC = g++
-CXXFLAGS = -std=c++17 -g -Wall
-LDFLAGS = 
+CXXFLAGS = -std=c++20 -g -Wall
+LDFLAGS = -lpthread
 
 # Makefile settings - Can be customized.
 APPNAME = TSP

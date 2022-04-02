@@ -13,11 +13,8 @@
 namespace TSP {
 
 class GTS : public TravellingSalesman {
-  public:
-    // GTS();
-    // ~GTS();
   protected:
-    std::vector<std::string> solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode, unsigned destinyNode);
+    std::vector<std::string> solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode);
 };
 
 }

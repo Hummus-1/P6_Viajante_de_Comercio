@@ -2,17 +2,22 @@
 
 namespace TSP {
 
-std::vector<std::string> GTS::solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode, unsigned destinyNode) {
+std::vector<std::string> GTS::solveProblem(AdjacencyMatrix& adjacencyMatrix, unsigned originNode) {
   std::vector<bool> visitedNodes(adjacencyMatrix.numberOfNodes(), false);
   std::vector<std::string> path;
   unsigned actualNode = originNode;
   path.push_back(adjacencyMatrix.convertNode(actualNode));
   visitedNodes[actualNode] = true;
-  while(actualNode != destinyNode) {
+  unsigned numberOfVisitedNodes = 1;
+  while(numberOfVisitedNodes != adjacencyMatrix.numberOfNodes()) {
     actualNode = adjacencyMatrix.closerConnection(actualNode, visitedNodes);
     path.push_back(adjacencyMatrix.convertNode(actualNode));
     visitedNodes[actualNode] = true;
+    ++numberOfVisitedNodes;
+    if(stop)
+      return std::vector<std::string>();
   }
+  path.push_back(adjacencyMatrix.convertNode(originNode));
   return path;
 }
 
