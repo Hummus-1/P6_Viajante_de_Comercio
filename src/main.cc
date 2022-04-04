@@ -4,92 +4,124 @@
 #include <string>
 #include <thread>
 #include <chrono> 
+#include <map>
+#include <filesystem>
+#include <math.h>
 
 #include "GreedyTravellingSalesman.h"
 #include "RudeTravellingSalesman.h"
 #include "DynamicTravellingSalesman.h"
 #include "menuUtility.h"
 
-void timer(TSP::TravellingSalesman& tsp)
+unsigned int factorial(unsigned int n) 
 {
-  std::this_thread::sleep_for (std::chrono::seconds(60));
-  tsp.stop = true;
+    if (n == 0)
+       return 1;
+    return n * factorial(n - 1);
 }
 
-int main() {
-  for(unsigned i = 3; i < 16; ++i) {
-    TSP::AdjacencyMatrix adjMatrix(i);
-    std::string size_str = std::to_string(i);
-    int size_size = size_str.size();
-    std::cout << " | " << *(new std::string((6 - size_size) / 2, ' ')) <<
-    " " << size_str <<
-    *(new std::string((6 - size_size) / 2 + (6 - size_size) % 2, ' ')) << " |-> ";
+void printColumn(std::string value, unsigned length, std::string final) {
+  std::cout << *(new std::string((length - value.size()) / 2, ' ')) <<
+  " " << value <<
+  *(new std::string((length - value.size()) / 2 + (length - value.size()) % 2, ' ')) << final; 
+}
 
-    TSP::RTS rudeTSP = *new TSP::RTS();
-    std::thread r (timer, std::ref(rudeTSP));
-    clock_t t_start_r = clock();
-    int costR = adjMatrix.pathWeight(rudeTSP.Solve(adjMatrix, adjMatrix.convertNode(2)));
-    double clock_r = (double)(clock() - t_start_r)/CLOCKS_PER_SEC;
-    std::string clock_r_str = std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC);
-    int clock_r_size = clock_r_str.size();
-    std::cout << *(new std::string((12 - clock_r_size) / 2, ' ')) <<
-    " " << clock_r_str <<
-    *(new std::string((12 - clock_r_size) / 2 + (12 - clock_r_size) % 2, ' ')) << " | ";
-    std::string costR_str = std::to_string(costR);
-    std::cout << *(new std::string((12 - costR_str.size()) / 2, ' ')) <<
-    " " << costR_str <<
-    *(new std::string((12 - costR_str.size()) / 2 + (12 - costR_str.size()) % 2, ' ')) << " | ";
-
-    TSP::GTS greedyTSP = *new TSP::GTS();
-    std::thread g (timer, std::ref(greedyTSP));    
-    clock_t t_start_g = clock();
-    int costG = adjMatrix.pathWeight(greedyTSP.Solve(adjMatrix, adjMatrix.convertNode(2)));
-    double clock_g = (double)(clock() - t_start_g)/CLOCKS_PER_SEC;
-    std::string clock_g_str = std::to_string(clock_g);
-    int clock_g_size = clock_g_str.size();
-    std::cout << *(new std::string((12 - clock_g_size) / 2, ' ')) <<
-    " " << clock_g_str <<
-    *(new std::string((12 - clock_g_size) / 2 + (12 - clock_g_size) % 2, ' ')) << " | ";
-    std::string costG_str = std::to_string(costG);
-    std::cout << *(new std::string((12 - costG_str.size()) / 2, ' ')) <<
-    " " << costG_str <<
-    *(new std::string((12 - costG_str.size()) / 2 + (12 - costG_str.size()) % 2, ' ')) << " | ";
-
-    TSP::DTS dynamicTSP = *new TSP::DTS();
-    std::thread d (timer, std::ref(dynamicTSP));
-    clock_t t_start_d = clock();
-    int costD = adjMatrix.pathWeight(dynamicTSP.Solve(adjMatrix, adjMatrix.convertNode(2)));
-    double clock_d = (double)(clock() - t_start_d)/CLOCKS_PER_SEC;
-    std::string clock_d_str = std::to_string(clock_d);
-    int clock_d_size = clock_d_str.size();
-    std::cout << *(new std::string((12 - clock_d_size) / 2, ' ')) <<
-    " " << clock_d_str <<
-    *(new std::string((12 - clock_d_size) / 2 + (12 - clock_d_size) % 2, ' ')) << " | ";
-    std::string costD_str = std::to_string(costD);
-    std::cout << *(new std::string((12 - costD_str.size()) / 2, ' ')) <<
-    " " << costD_str <<
-    *(new std::string((12 - costD_str.size()) / 2 + (12 - costD_str.size()) % 2, ' ')) << " | ";
-
-    g.detach();
-    r.detach();
-    d.detach();
-    std::cout << '\n';
-  }
-  //a.exportInstance("b.txt");
-   TSP::AdjacencyMatrix a(4);
-   TSP::RTS rudeTSP;
+std::map<std::string, double> howMuchTime(bool callback = false) {
+  if(callback)
+    howMuchTime();
+  std::map<std::string, double> timeMap;
+  TSP::AdjacencyMatrix adjMatrix(7);
+  TSP::GTS greedyTSP;
+  TSP::RTS rudeTSP;
   TSP::DTS dynamicTSP;
-  std::vector<std::string> path2 = dynamicTSP.Solve(a, a.convertNode(2));
-  std::vector<std::string> path1 = rudeTSP.Solve(a, a.convertNode(2));
-  std::vector<std::string> path = rudeTSP.Solve(a, "x");
-  for(unsigned i = 0; i < path1.size(); ++i) {
-    std::cout << path1[i] << ' ';
+
+  clock_t t_start = clock();
+  greedyTSP.Solve(adjMatrix, adjMatrix.convertNode(2));
+  timeMap["greedy"] = ((double)(clock() - t_start)/CLOCKS_PER_SEC) / 7;
+
+  t_start = clock();
+  rudeTSP.Solve(adjMatrix, adjMatrix.convertNode(2));
+  timeMap["rude"] = ((double)(clock() - t_start)/CLOCKS_PER_SEC) / 7;
+
+  t_start = clock();
+  dynamicTSP.Solve(adjMatrix, adjMatrix.convertNode(2));
+  timeMap["dynamic"] = ((double)(clock() - t_start)/CLOCKS_PER_SEC) / 7;
+
+  return timeMap;
+}
+
+void printTSP(unsigned size, unsigned maxSeconds, TSP::AdjacencyMatrix &adjMatrix, std::map<std::string, double> timeMap) {
+  printColumn(std::to_string(size), 6, " |-> ");
+
+  double rudeTime = (factorial(size) * timeMap["rude"]) / 750;
+  if((rudeTime > maxSeconds) || (rudeTime == 0.0)) {
+    printColumn("EXCESSIVE", 12, " | ");
+    printColumn("EXCESSIVE", 12, " | ");
   }
-  std::cout << '\n';
-  for(unsigned i = 0; i < path2.size(); ++i) {
-    std::cout << path2[i] << ' ';
+  else {
+    TSP::RTS rudeTSP;
+    clock_t t_start_r = clock();
+    printColumn(std::to_string(adjMatrix.pathWeight(rudeTSP.Solve(adjMatrix, adjMatrix.convertNode(1)))), 12, " | ");
+    printColumn(std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC), 12, " | ");
   }
-  //a.exportInstance("4.txt");
-  std::cout << '\n' << a.pathWeight(path1) << '\n';
-  std::cout << '\n' << a.pathWeight(path2) << '\n';
+
+  double greedyTime = timeMap["greedy"] * size * 750;
+  if((greedyTime > maxSeconds) || greedyTime == 0.0) {
+    printColumn("EXCESSIVE", 12, " | ");
+    printColumn("EXCESSIVE", 12, " | ");
+  }
+  else {
+    TSP::GTS greedyTSP;
+    clock_t t_start_r = clock();
+    printColumn(std::to_string(adjMatrix.pathWeight(greedyTSP.Solve(adjMatrix, adjMatrix.convertNode(1)))), 12, " | ");
+    printColumn(std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC), 12, " | ");
+  }
+
+  double dynamicTime = (std::pow(2, size) * std::pow(size, 2) * timeMap["dynamic"]) / 750;
+  if((dynamicTime > maxSeconds) || (dynamicTime == 0.0)) {
+    printColumn("EXCESSIVE", 12, " | ");
+    printColumn("EXCESSIVE", 12, " |\n");
+  }
+  else {
+    TSP::DTS dynamicTSP;
+    clock_t t_start_r = clock();
+    printColumn(std::to_string(adjMatrix.pathWeight(dynamicTSP.Solve(adjMatrix, adjMatrix.convertNode(1)))), 12, " | ");
+    printColumn(std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC), 12, " |\n");
+  }
+}
+
+int main(int argc, char **argv) {
+  try {
+    if(argc == 2) {
+      TSP::AdjacencyMatrix adjMatrix(std::stoi(argv[1]));
+      adjMatrix.exportInstance("adjMatrix.txt");
+      return 0;
+    }
+    if(argc != 3)
+        throw std::length_error("2 arguments required\nExecution: ./TSP filename maxSeconds\n");
+    float maxSeconds = std::stoi(argv[2]);
+    std::map<std::string, double> timeMap = howMuchTime(true);
+    try {
+      unsigned maxSize = std::stoi(argv[1]);
+      std::cout << "  Size           Brute Force Cost/Time           Greedy Cost/Time                Dynamic Cost/Time\n";
+      for(unsigned i = 2; i <= maxSize; ++i) {
+        TSP::AdjacencyMatrix adjMatrix(i);
+        printTSP(i, maxSeconds, adjMatrix, timeMap);
+      }
+    }
+    catch(std::length_error &e) {
+      std::cout << e.what() << "\n";
+    }
+    catch(std::invalid_argument &e) {
+      std::string path = argv[1];
+      std::cout << "  Size          Brute Force Cost/Time            Greedy Cost/Time                Dynamic Cost/Time\n";
+      for (const auto & entry : std::filesystem::directory_iterator(path)) {
+        TSP::AdjacencyMatrix adjMatrix(entry.path());
+        printTSP(adjMatrix.numberOfNodes(), maxSeconds, adjMatrix, timeMap);
+      }
+    }
+  }
+  catch(std::invalid_argument &e) {
+    std::cout << "The second argument should be a number\nExecution: ./TSP filename maxSeconds\n";
+  }
 }

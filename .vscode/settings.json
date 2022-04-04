@@ -78,6 +78,9 @@
     "thread": "cpp",
     "typeindex": "cpp",
     "valarray": "cpp",
-    "stop_token": "cpp"
+    "stop_token": "cpp",
+    "coroutine": "cpp",
+    "numbers": "cpp",
+    "span": "cpp"
   }
 }

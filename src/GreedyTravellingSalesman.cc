@@ -14,8 +14,6 @@ std::vector<std::string> GTS::solveProblem(AdjacencyMatrix& adjacencyMatrix, uns
     path.push_back(adjacencyMatrix.convertNode(actualNode));
     visitedNodes[actualNode] = true;
     ++numberOfVisitedNodes;
-    if(stop)
-      return std::vector<std::string>();
   }
   path.push_back(adjacencyMatrix.convertNode(originNode));
   return path;

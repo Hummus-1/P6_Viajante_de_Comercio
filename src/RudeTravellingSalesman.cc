@@ -7,14 +7,14 @@ std::vector<std::string> RTS::solveProblem(AdjacencyMatrix& adjacencyMatrix, uns
   int minWeight = INT32_MAX;
   std::vector<unsigned> minPath;
   std::vector<std::string> minPathNames;
-  for(unsigned i = 0; i < paths.size() && !stop; ++i) {
+  for(unsigned i = 0; i < paths.size(); ++i) {
     int actualWeight = adjacencyMatrix.pathWeight(paths[i]);
     if(actualWeight < minWeight) {
       minPath = paths[i];
       minWeight = actualWeight;
     }
   }
-  for(unsigned i = 0; i < minPath.size() && !stop; ++i) {
+  for(unsigned i = 0; i < minPath.size(); ++i) {
     minPathNames.push_back(adjacencyMatrix.convertNode(minPath[i]));
   }
   return minPathNames;
@@ -22,7 +22,7 @@ std::vector<std::string> RTS::solveProblem(AdjacencyMatrix& adjacencyMatrix, uns
 
 std::vector<std::vector<unsigned> > RTS::allCombinations(AdjacencyMatrix& adjacencyMatrix, std::vector<unsigned> myPath) {
   std::vector<std::vector<unsigned> > paths;
-  for(unsigned i = 0; i < adjacencyMatrix.numberOfNodes() && !stop; ++i) {
+  for(unsigned i = 0; i < adjacencyMatrix.numberOfNodes(); ++i) {
     std::vector<unsigned> newPath = myPath;
     newPath.push_back(i);
     if(adjacencyMatrix.numberOfNodes() == (newPath.size() - 1) && i == myPath[0]) {

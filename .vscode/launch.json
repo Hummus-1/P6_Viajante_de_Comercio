@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/TSP",
-      "args": [],
+      "args": ["50", "2"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
