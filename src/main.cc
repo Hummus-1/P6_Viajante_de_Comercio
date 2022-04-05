@@ -26,6 +26,21 @@ void printColumn(std::string value, unsigned length, std::string final) {
   *(new std::string((length - value.size()) / 2 + (length - value.size()) % 2, ' ')) << final; 
 }
 
+unsigned maxSizeForTime(unsigned time, char algorithm, std::map<std::string, double> &timeMap) {
+  float actualTime = 0;
+  unsigned size = 2;
+  for(; actualTime <= time; ++size) {
+    if(algorithm == 'g') {
+      actualTime = timeMap["greedy"] * size * 750;
+    } else if(algorithm == 'r') {
+      actualTime = (factorial(size) * timeMap["rude"]) / 750;
+    } else if(algorithm == 'd') {
+      actualTime = (std::pow(2, size) * std::pow(size, 2) * timeMap["dynamic"]) / 750;
+    }
+  }
+  return size - 2;
+}
+
 std::map<std::string, double> howMuchTime(bool callback = false) {
   if(callback)
     howMuchTime();
@@ -50,44 +65,57 @@ std::map<std::string, double> howMuchTime(bool callback = false) {
   return timeMap;
 }
 
-void printTSP(unsigned size, unsigned maxSeconds, TSP::AdjacencyMatrix &adjMatrix, std::map<std::string, double> timeMap) {
+void printTSP(unsigned size, unsigned maxSeconds, TSP::AdjacencyMatrix &adjMatrix, std::map<std::string, unsigned> sizeMap, unsigned iterations = 1) {
+  std::map<std::string, std::pair<float, unsigned> > timeMap;
+  timeMap["rude"] = std::make_pair(0, 0);
+  timeMap["greedy"] = std::make_pair(0, 0);
+  timeMap["dynamic"] = std::make_pair(0, 0);
+
   printColumn(std::to_string(size), 6, " |-> ");
-
-  double rudeTime = (factorial(size) * timeMap["rude"]) / 750;
-  if((rudeTime > maxSeconds) || (rudeTime == 0.0)) {
-    printColumn("EXCESSIVE", 12, " | ");
-    printColumn("EXCESSIVE", 12, " | ");
-  }
-  else {
+  for(unsigned i = 0; i < iterations; ++i) {
     TSP::RTS rudeTSP;
-    clock_t t_start_r = clock();
-    printColumn(std::to_string(adjMatrix.pathWeight(rudeTSP.Solve(adjMatrix, adjMatrix.convertNode(1)))), 12, " | ");
-    printColumn(std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC), 12, " | ");
-  }
+    if(sizeMap["rude"] < size) {
+      TSP::AdjacencyMatrix newAdjMatrix = adjMatrix.reduce(sizeMap["rude"]);
+      timeMap["rude"].first += 600;
+      timeMap["rude"].second += newAdjMatrix.pathWeight(rudeTSP.Solve(newAdjMatrix, newAdjMatrix.convertNode(1)));
+    }
+    else {
+      clock_t t_start_r = clock();
+      timeMap["rude"].second += adjMatrix.pathWeight(rudeTSP.Solve(adjMatrix, adjMatrix.convertNode(1)));
+      timeMap["rude"].first += (double)(clock() - t_start_r)/CLOCKS_PER_SEC;
+    }
 
-  double greedyTime = timeMap["greedy"] * size * 750;
-  if((greedyTime > maxSeconds) || greedyTime == 0.0) {
-    printColumn("EXCESSIVE", 12, " | ");
-    printColumn("EXCESSIVE", 12, " | ");
-  }
-  else {
     TSP::GTS greedyTSP;
-    clock_t t_start_r = clock();
-    printColumn(std::to_string(adjMatrix.pathWeight(greedyTSP.Solve(adjMatrix, adjMatrix.convertNode(1)))), 12, " | ");
-    printColumn(std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC), 12, " | ");
-  }
+    if(sizeMap["greedy"] < size) {
+      TSP::AdjacencyMatrix newAdjMatrix = adjMatrix.reduce(sizeMap["greedy"]);
+      timeMap["greedy"].first += 600;
+      timeMap["greedy"].second += newAdjMatrix.pathWeight(greedyTSP.Solve(newAdjMatrix, newAdjMatrix.convertNode(1)));
+    }
+    else {
+      clock_t t_start_r = clock();
+      timeMap["greedy"].second += adjMatrix.pathWeight(greedyTSP.Solve(adjMatrix, adjMatrix.convertNode(1)));
+      timeMap["greedy"].first += (double)(clock() - t_start_r)/CLOCKS_PER_SEC;
+    }
 
-  double dynamicTime = (std::pow(2, size) * std::pow(size, 2) * timeMap["dynamic"]) / 750;
-  if((dynamicTime > maxSeconds) || (dynamicTime == 0.0)) {
-    printColumn("EXCESSIVE", 12, " | ");
-    printColumn("EXCESSIVE", 12, " |\n");
-  }
-  else {
     TSP::DTS dynamicTSP;
-    clock_t t_start_r = clock();
-    printColumn(std::to_string(adjMatrix.pathWeight(dynamicTSP.Solve(adjMatrix, adjMatrix.convertNode(1)))), 12, " | ");
-    printColumn(std::to_string((double)(clock() - t_start_r)/CLOCKS_PER_SEC), 12, " |\n");
+    if(sizeMap["dynamic"] < size) {
+      TSP::AdjacencyMatrix newAdjMatrix = adjMatrix.reduce(sizeMap["dynamic"]);
+      timeMap["dynamic"].first += 600;
+      timeMap["dynamic"].second += newAdjMatrix.pathWeight(dynamicTSP.Solve(newAdjMatrix, newAdjMatrix.convertNode(1)));
+    }
+    else {
+      clock_t t_start_r = clock();
+      timeMap["dynamic"].second += adjMatrix.pathWeight(dynamicTSP.Solve(adjMatrix, adjMatrix.convertNode(1)));
+      timeMap["dynamic"].first += (double)(clock() - t_start_r)/CLOCKS_PER_SEC;
+    }
+    adjMatrix = TSP::AdjacencyMatrix(adjMatrix.numberOfNodes());
   }
+  printColumn(std::to_string(timeMap["rude"].second / iterations), 12, " | ");
+  printColumn(std::to_string(timeMap["rude"].first / iterations), 12, " | ");
+  printColumn(std::to_string(timeMap["greedy"].second / iterations), 12, " | ");
+  printColumn(std::to_string(timeMap["greedy"].first / iterations), 12, " | ");
+  printColumn(std::to_string(timeMap["dynamic"].second / iterations), 12, " | ");
+  printColumn(std::to_string(timeMap["dynamic"].first / iterations), 12, " | \n");
 }
 
 int main(int argc, char **argv) {
@@ -97,16 +125,24 @@ int main(int argc, char **argv) {
       adjMatrix.exportInstance("adjMatrix.txt");
       return 0;
     }
-    if(argc != 3)
+    if(argc < 3 || argc > 4)
         throw std::length_error("2 arguments required\nExecution: ./TSP filename maxSeconds\n");
     float maxSeconds = std::stoi(argv[2]);
+    unsigned numberOfIterations = (argc == 4) ? std::stoi(argv[3]) : 1;
     std::map<std::string, double> timeMap = howMuchTime(true);
+    std::map<std::string, unsigned> sizeMap;
+    sizeMap["rude"] = maxSizeForTime(maxSeconds, 'r', timeMap);
+    sizeMap["greedy"] = maxSizeForTime(maxSeconds, 'g', timeMap);
+    sizeMap["dynamic"] = maxSizeForTime(maxSeconds, 'd', timeMap);
+    sizeMap["rude"] = maxSizeForTime(maxSeconds, 'r', timeMap);
+    sizeMap["greedy"] = maxSizeForTime(maxSeconds, 'g', timeMap);
+    sizeMap["dynamic"] = maxSizeForTime(maxSeconds, 'd', timeMap);
     try {
       unsigned maxSize = std::stoi(argv[1]);
       std::cout << "  Size           Brute Force Cost/Time           Greedy Cost/Time                Dynamic Cost/Time\n";
       for(unsigned i = 2; i <= maxSize; ++i) {
         TSP::AdjacencyMatrix adjMatrix(i);
-        printTSP(i, maxSeconds, adjMatrix, timeMap);
+        printTSP(i, maxSeconds, adjMatrix, sizeMap, numberOfIterations);
       }
     }
     catch(std::length_error &e) {
@@ -117,7 +153,7 @@ int main(int argc, char **argv) {
       std::cout << "  Size          Brute Force Cost/Time            Greedy Cost/Time                Dynamic Cost/Time\n";
       for (const auto & entry : std::filesystem::directory_iterator(path)) {
         TSP::AdjacencyMatrix adjMatrix(entry.path());
-        printTSP(adjMatrix.numberOfNodes(), maxSeconds, adjMatrix, timeMap);
+        printTSP(adjMatrix.numberOfNodes(), maxSeconds, adjMatrix, sizeMap);
       }
     }
   }

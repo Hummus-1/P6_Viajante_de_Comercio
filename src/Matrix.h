@@ -25,6 +25,7 @@ class Matrix {
     Matrix operator-(Matrix matrix_b);
     Matrix operator*(Matrix matrix_b);
     void DefineProductAlgorithm(char algorithm_type);
+    void resize(unsigned n, unsigned m);
 
   private:
     Matrix Product(Matrix matrix_b);

@@ -113,4 +113,11 @@ unsigned AdjacencyMatrix::numberOfNodes() {
   return nodes_.size();
 }
 
+AdjacencyMatrix AdjacencyMatrix::reduce(unsigned numerOfNodes) {
+  AdjacencyMatrix reducedMatrix = *this;
+  reducedMatrix.adjacencyMatrix_.resize(numerOfNodes, numerOfNodes);
+  reducedMatrix.nodes_.resize(numerOfNodes);
+  return reducedMatrix;
+}
+
 }

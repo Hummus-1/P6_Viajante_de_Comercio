@@ -9,16 +9,24 @@
 #include <ctime>
 
 #include "Matrix.h"
-//#include "RandomString.cc"
 #include "menuUtility.h"
 
 namespace TSP {
 
+/**
+ * @brief Represents an adjacency matrix for a travelling salesman problem.
+ * 
+ */
 class AdjacencyMatrix {
   public: 
     AdjacencyMatrix(unsigned numberOfNodes);
     AdjacencyMatrix(std::string path);
 
+    /**
+     * @brief Export the adjacency matrix to a file.
+     * 
+     * @param path The file path
+     */
     void exportInstance(std::string path);
 
     unsigned convertNode(std::string nodeName) {return nodesRelation_[nodeName];}
@@ -28,6 +36,7 @@ class AdjacencyMatrix {
     unsigned numberOfNodes();
     int pathWeight(std::vector<std::string> path);
     int pathWeight(std::vector<unsigned> path);
+    AdjacencyMatrix reduce(unsigned numerOfNodes);
 
     unsigned closerConnection(unsigned originNode, std::vector<bool> visitedNodes = *new std::vector<bool>(0));
   private:

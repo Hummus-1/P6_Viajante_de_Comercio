@@ -111,3 +111,12 @@ Matrix Matrix::operator-(Matrix matrix_b) {
   }
   return result;
 }
+
+void Matrix::resize(unsigned n, unsigned m) {
+  n_rows_ = n;
+  n_columns_ = m;
+  matrix_.resize(n_rows_);
+  for(unsigned i = 0; i < n; ++i) {
+    matrix_[i].resize(n_columns_);
+  }
+}
